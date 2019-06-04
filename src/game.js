@@ -10,7 +10,7 @@ class Game {
         // this.camera.position.z = 3;
         // this.camera.position.y = 2;
         // this.camera.rotation.x = -(Math.PI / 60);
-        this.camera.position.set( 0, 600, 0 );
+        this.camera.position.set( 0, 800, 250 );
 
         this.scene = new THREE.Scene();
         this.scene.background = new THREE.Color( 0xa0a0a0 );
@@ -47,9 +47,12 @@ class Game {
         var objLoader = new THREE.OBJLoader();
         objLoader.setPath('src/assets/objs/');
         objLoader.load('sylvanas_obj.obj', (obj) => {
-            obj.position.x = 0;
-            obj.position.y = 0;
-            this.scene.add(obj);
+            this.character = obj;
+            this.character.move = {};
+            this.character.position.x = 0;
+            this.character.position.y = 0;
+            this.scene.add(this.character);
+            this.camera.lookAt(this.character.position);
         });
 
         this.renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -59,18 +62,45 @@ class Game {
 
         document.body.appendChild(this.renderer.domElement);
 
-        var controls = new THREE.OrbitControls( this.camera, this.renderer.domElement );
-        controls.target.set( 0, 300, 0 );
-        controls.update();
+
+        window.addEventListener('keydown', (e) => {
+            e.preventDefault();
+
+            if (e.keyCode == 37) this.character.move.up = true;
+            if (e.keyCode == 39) this.character.move.down = true;
+            if (e.keyCode == 40) this.character.move.left = true;
+            if (e.keyCode == 38) this.character.move.right = true;
+        });
+        window.addEventListener('keyup', (e) => {
+            e.preventDefault();
+            
+            if (e.keyCode == 37) this.character.move.up = false;
+            if (e.keyCode == 39) this.character.move.down = false;
+            if (e.keyCode == 40) this.character.move.left = false;
+            if (e.keyCode == 38) this.character.move.right = false;
+        });
+
+        // var controls = new THREE.OrbitControls( this.camera, this.renderer.domElement );
+        // controls.target.set( 0, 0, 0 );
+        // controls.update();
 
         // stats
-        // var stats = new Stats();
-        // container.appendChild( stats.dom );
+        var stats = new Stats();
+        document.body.appendChild( stats.dom );
 
         window.addEventListener( 'resize', this.onWindowResize);
 
         var animate = () => {
+            stats.update();
+            
             requestAnimationFrame(animate);
+
+            if (this.character) {
+                if (this.character.move.up) this.character.position.x -= 10;
+                if (this.character.move.down) this.character.position.x += 10;
+                if (this.character.move.left) this.character.position.z -= 10;
+                if (this.character.move.right) this.character.position.z += 10;
+            }
 
             this.renderer.render(this.scene, this.camera);
         }
