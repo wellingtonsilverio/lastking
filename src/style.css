@@ -1,3 +1,7 @@
+* {
+    cursor: default;
+}
+
 body {
     background-color: #000000;
     margin: 0;
@@ -5,7 +9,8 @@ body {
 }
 
 #game-menu {
-    background-color: #165165;
+    background-color: #16516555;
+    color: #ffffff;
     display: block;
     position: absolute;
     top: 0;
@@ -14,5 +19,19 @@ body {
     max-width: 450px;
     min-width: 300px;
     height: 100%;
-    padding: 8px;
+}
+
+#game-menu .container {
+    padding: 10%;
+}
+
+#game-menu .container ul li {
+    list-style: none;
+    padding: 12px;
+    margin: 6px 0;
+}
+
+#game-menu .container a {
+    text-decoration: none;
+    color: #ffffff;
 }
