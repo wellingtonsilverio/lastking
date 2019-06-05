@@ -1,27 +1,33 @@
 <!DOCTYPE html>
-<html>
-	<head>
-		<meta charset=utf-8>
-		<title>Lastking</title>
-		<style>
-			body { margin: 0; padding: 0; overflow: hidden; }
-			canvas { width: 100%; height: 100% }
-        </style>
-        
-		<script src="src/lib/threejs/three.min.js"></script>
-		
-		<script src="src/lib/threejs/controls/OrbitControls.js"></script>
+<html lang="pt-BR">
 
-		<script src="src/lib/threejs/WebGL.js"></script>
-		<script src="src/lib/threejs/libs/stats.min.js"></script>
+<head>
+    <meta charset="UTF-8">
+    <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
+    <!-- <meta http-equiv="X-UA-Compatible" content="ie=edge"> -->
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+    <title>Lastking</title>
 
-		<script src="src/lib/threejs/loaders/OBJLoader.js"></script>
-		
-		<script src="src/game.js"></script>
-		<script src="src/debug.js"></script>
-		<script>
-			new Debug(true);
-		</script>
-	</head>
-	<body></body>
+    <link rel="stylesheet" href="src/style.css">
+</head>
+
+<body>
+    <div id="game">
+        <div id="game-menu"></div>
+    </div>
+
+    <!-- development version, includes helpful console warnings -->
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <!-- production version, optimized for size and speed
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script> -->
+
+    <script src="src/libs/threejs/three.min.js"></script>
+
+    <script src="src/game.js"></script>
+    <script src="src/debug.js"></script>
+    <script>
+        new Debug(true);
+    </script>
+</body>
+
 </html>
