@@ -13,16 +13,31 @@
 
 <body>
     <div id="game">
-        <div id="game-menu">
+        <div class="game-menu hidden">
             <div class="container">
-                <h2>MENU PRINCIPAL</h2>
-                <h1>LASTKING</h1>
+                <div class="title">
+                    <h2>MENU PRINCIPAL</h2>
+                    <h1>LASTKING</h1>
+                </div>
                 <ul>
                     <a href="#"><li>CONTINUAR</li></a>
                     <a href="#"><li>PERSONAGEM</li></a>
                     <a href="#"><li>MOCHILA</li></a>
                     <a href="#"><li>CONFIGURAÇÕES</li></a>
                 </ul>
+            </div>
+        </div>
+        <div class="game-login">
+            <div class="container">
+                <div class="title">
+                    <h2>ENTRAR</h2>
+                    <h1>LASTKING</h1>
+                </div>
+                <div>
+                    <input type="text" name="user" id="" placeholder="Nome de usuário">
+                    <input type="password" name="password" id="" placeholder="Senha de acesso">
+                    <input type="button" value="ENTRAR AGORA" onclick="window.game.logInGame()">
+                </div>
             </div>
         </div>
     </div>

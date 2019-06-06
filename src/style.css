@@ -8,10 +8,9 @@ body {
     padding: 0;
 }
 
-#game-menu {
+.game-menu {
     background-color: #16516555;
     color: #ffffff;
-    display: block;
     position: absolute;
     top: 0;
     left: 0;
@@ -19,19 +18,76 @@ body {
     max-width: 450px;
     min-width: 300px;
     height: 100%;
+    overflow: hidden;
 }
 
-#game-menu .container {
+.game-menu .container {
     padding: 10%;
 }
 
-#game-menu .container ul li {
+.game-menu .container .title {
+    margin-bottom: 24px;
+}
+
+.game-menu .container ul li {
     list-style: none;
     padding: 12px;
     margin: 6px 0;
 }
 
-#game-menu .container a {
+.game-menu .container a {
     text-decoration: none;
     color: #ffffff;
+}
+
+.game-login {
+    display: block;
+    background-color: #16516555;
+    color: #ffffff;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 40%;
+    max-width: 450px;
+    min-width: 300px;
+    height: 100%;
+    overflow: hidden;
+}
+
+.game-login .container {
+    padding: 10%;
+}
+
+.game-login .container .title {
+    margin-bottom: 24px;
+}
+
+.game-login .container input {
+    background-color: transparent;
+    border: none;
+    color: #ffffff;
+    width: 100%;
+    font-size: 18px;
+    margin: 12px 0;
+    text-transform: uppercase;
+}
+.game-login .container input[type="button"] {
+    margin-top: 20px;
+}
+
+.game-login .container input:focus{
+    outline: none;
+}
+
+.hidden {
+    transition: all 2s ease-out;
+    overflow: hidden;
+    width: 0;
+    min-width: 0;
+    opacity: 0;
+}
+
+.hidden *{
+    transition: all 0.5s linear;
+    opacity: 0;
 }
