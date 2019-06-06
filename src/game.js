@@ -1,5 +1,17 @@
 class Game {
-    constructor() { }
+    constructor() {
+        document.addEventListener('keydown', (e) => {
+            e.preventDefault();
+
+            switch (e.keyCode) {
+                case 27:
+                    this.openMenu();
+                    break;
+            }
+        });
+
+        this.openLogin();
+    }
 
     logInGame() {
         var user = "";
@@ -11,7 +23,7 @@ class Game {
         for (let element of document.getElementsByName('password')) {
             pass = element.value
         }
-        
+
         // var myRequest = new Request("https://pokeapi.co/api/v2/ability/4/");
         // fetch(myRequest)
         //     .then(response => response.json().then((json) => {
@@ -21,10 +33,11 @@ class Game {
         localStorage.setItem("_user", "o465token21873198que182vem129309218na12req");
 
         this.openGame();
-        setTimeout(() => this.openMenu(), 3000);
     }
 
     openGame() {
+        this._user = localStorage.getItem("_user");
+        
         if (this._user) {
             for (let element of document.getElementsByClassName('game-login')) {
                 if (!element.classList.contains("hidden")) element.classList.add("hidden");
@@ -33,19 +46,31 @@ class Game {
                 if (!element.classList.contains("hidden")) element.classList.add("hidden");
             }
         } else {
-            this._user = localStorage.getItem("_user");
+            this.openLogin();
+        }
+    }
+
+    openLogin() {
+        this._user = localStorage.getItem("_user");
+
+        if (!this._user) {
+            for (let element of document.getElementsByClassName('game-login')) {
+                element.classList.remove("hidden");
+            }
+        } else {
             this.openGame();
         }
     }
 
     openMenu() {
+        this._user = localStorage.getItem("_user");
+
         if (this._user) {
             for (let element of document.getElementsByClassName('game-menu')) {
                 element.classList.remove("hidden");
             }
         } else {
-            this._user = localStorage.getItem("_user");
-            this.openMenu();
+            this.openLogin();
         }
     }
 }
