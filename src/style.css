@@ -6,10 +6,11 @@ body {
     background-color: #000000;
     margin: 0;
     padding: 0;
+    overflow: hidden;
 }
 
 .game-menu {
-    background-color: #16516555;
+    background-color: rgba(13, 52, 65, 0.667);
     color: #ffffff;
     position: absolute;
     top: 0;
@@ -80,14 +81,13 @@ body {
 }
 
 .hidden {
-    transition: all 2s ease-out;
+    transition: all 0.5s linear;
     overflow: hidden;
     width: 0;
     min-width: 0;
-    opacity: 0;
 }
 
 .hidden *{
-    transition: all 0.5s linear;
+    transition: all 0.1s linear;
     opacity: 0;
 }
