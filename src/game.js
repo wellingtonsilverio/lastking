@@ -16,7 +16,7 @@ class Game {
         this.direction = new THREE.Vector3();
         this.vertex = new THREE.Vector3();
         this.color = new THREE.Color();
-        
+
         this.init();
         this.animate();
     }
@@ -57,7 +57,7 @@ class Game {
             for (let element of document.getElementsByClassName('game-menu')) {
                 if (!element.classList.contains("hidden")) element.classList.add("hidden");
             }
-            
+
             this.startGame();
         } else {
             this.openLogin();
@@ -90,10 +90,10 @@ class Game {
 
 
     init = () => {
-        this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1000);
+        this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 800);
         this.scene = new THREE.Scene();
         this.scene.background = new THREE.Color(0xffffff);
-        this.scene.fog = new THREE.Fog(0xcccccc, 0, 750);
+        this.scene.fog = new THREE.Fog(0xcccccc, 0, 600);
         var light = new THREE.HemisphereLight(0xeeeeff, 0x777788, 0.75);
         light.position.set(0.5, 1, 0.75);
         this.scene.add(light);
@@ -102,11 +102,34 @@ class Game {
         this.scene.add(this.controls.getObject());
 
         this.raycaster = new THREE.Raycaster(new THREE.Vector3(), new THREE.Vector3(0, - 1, 0), 0, 10);
-        // floor
+
+        var position = null;
+        var colors = [];
+
+        this.floor(position, colors);
+
+        // objects
+        this.generateBoxs(position, colors);
+
+        this.renderer = new THREE.WebGLRenderer({ antialias: true });
+        this.renderer.setPixelRatio(window.devicePixelRatio);
+        this.renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(this.renderer.domElement);
+
+        window.addEventListener('resize', this.onWindowResize, false);
+        document.addEventListener('keydown', this.onKeyDown, false);
+        document.addEventListener('keyup', this.onKeyUp, false);
+        this.menuOpened = false;
+        document.addEventListener('pointerlockchange', () => {
+            if (!this.controls.isLocked) this.openMenu();
+        }, false);
+    }
+
+    floor = (position, colors) => {
         var floorGeometry = new THREE.PlaneBufferGeometry(2000, 2000, 100, 100);
         floorGeometry.rotateX(- Math.PI / 2);
         // vertex displacement
-        var position = floorGeometry.attributes.position;
+        position = floorGeometry.attributes.position;
         for (var i = 0, l = position.count; i < l; i++) {
             this.vertex.fromBufferAttribute(position, i);
             this.vertex.x += Math.random() * 20 - 10;
@@ -114,9 +137,9 @@ class Game {
             this.vertex.z += Math.random() * 20 - 10;
             position.setXYZ(i, this.vertex.x, this.vertex.y, this.vertex.z);
         }
-        floorGeometry = floorGeometry.toNonIndexed(); // ensure each face has unique vertices
+        // floorGeometry = floorGeometry.toNonIndexed(); // ensure each face has unique vertices
         position = floorGeometry.attributes.position;
-        var colors = [];
+
         for (var i = 0, l = position.count; i < l; i++) {
             this.color.setHSL(Math.random() * 0.3 + 0.5, 0.75, Math.random() * 0.25 + 0.75);
             colors.push(this.color.r, this.color.g, this.color.b);
@@ -124,10 +147,14 @@ class Game {
         floorGeometry.addAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
         var floorMaterial = new THREE.MeshBasicMaterial({ vertexColors: THREE.VertexColors });
         var floor = new THREE.Mesh(floorGeometry, floorMaterial);
+
         this.scene.add(floor);
-        // objects
+        this.objects.push(floor);
+    }
+
+    generateBoxs = (position, colors) => {
         var boxGeometry = new THREE.BoxBufferGeometry(20, 20, 20);
-        boxGeometry = boxGeometry.toNonIndexed(); // ensure each face has unique vertices
+        // boxGeometry = boxGeometry.toNonIndexed(); // ensure each face has unique vertices
         position = boxGeometry.attributes.position;
         colors = [];
         for (var i = 0, l = position.count; i < l; i++) {
@@ -145,56 +172,82 @@ class Game {
             this.scene.add(box);
             this.objects.push(box);
         }
-        
-        this.renderer = new THREE.WebGLRenderer({ antialias: true });
-        this.renderer.setPixelRatio(window.devicePixelRatio);
-        this.renderer.setSize(window.innerWidth, window.innerHeight);
-        document.body.appendChild(this.renderer.domElement);
-        
-        window.addEventListener('resize', this.onWindowResize, false);
-        document.addEventListener('keydown', this.onKeyDown, false);
-        document.addEventListener('keyup', this.onKeyUp, false);
-        this.menuOpened = false;
-        document.addEventListener('pointerlockchange', () => {
-            if (!this.controls.isLocked) this.openMenu();
-        }, false);
+
+        var animate = () => {
+            requestAnimationFrame(animate);
+
+            if (this.controls.isLocked === true) {
+                var intersections = this.raycaster.intersectObjects(this.objects);
+                this.onObject = intersections.length > 0;
+            }
+        };
+        animate();
     }
 
     animate = () => {
         requestAnimationFrame(this.animate);
 
-        if (this.controls.isLocked === true) {
-            this.raycaster.ray.origin.copy(this.controls.getObject().position);
-            this.raycaster.ray.origin.y -= 10;
-            var intersections = this.raycaster.intersectObjects(this.objects);
-            var onObject = intersections.length > 0;
-            var time = performance.now();
-            var delta = (time - this.prevTime) / 1000;
-            this.velocity.x -= this.velocity.x * 10.0 * delta;
-            this.velocity.z -= this.velocity.z * 10.0 * delta;
-            this.velocity.y -= 9.8 * 100.0 * delta; // 100.0 = mass
-            this.direction.z = Number(this.moveForward) - Number(this.moveBackward);
-            this.direction.x = Number(this.moveLeft) - Number(this.moveRight);
-            this.direction.normalize(); // this ensures consistent movements in all directions
-            if (this.moveForward || this.moveBackward) this.velocity.z -= this.direction.z * 400.0 * delta;
-            if (this.moveLeft || this.moveRight) this.velocity.x -= this.direction.x * 400.0 * delta;
-            if (onObject === true) {
-                this.velocity.y = Math.max(0, this.velocity.y);
-                this.canJump = true;
-            }
-            this.controls.getObject().translateX(this.velocity.x * delta);
-            this.controls.getObject().position.y += (this.velocity.y * delta); // new behavior
-            this.controls.getObject().translateZ(this.velocity.z * delta);
-            if (this.controls.getObject().position.y < 10) {
-                this.velocity.y = 0;
-                this.controls.getObject().position.y = 10;
-                this.canJump = true;
-            }
-            this.prevTime = time;
-        }
-        
+        var time = performance.now();
+        var delta = (time - this.prevTime) / 1000;
+
+        this.settings(delta);
+
+        this.prevTime = time;
+
         this.renderer.render(this.scene, this.camera);
     }
+
+    settings = (delta) => {
+        if (this.controls.isLocked === true) {
+            this.settingRaycaster();
+
+            this.settingControls(delta);
+
+            this.hasOnObject();
+
+            this.settingsControlsCharacter(delta);
+            
+            this.dontFall();
+        }
+    };
+
+    settingRaycaster = () => {
+        this.raycaster.ray.origin.copy(this.controls.getObject().position);
+        this.raycaster.ray.origin.y -= 10;
+    };
+
+    settingControls = (delta) => {
+        this.velocity.x -= this.velocity.x * 10.0 * delta;
+        this.velocity.z -= this.velocity.z * 10.0 * delta;
+        this.velocity.y -= 9.8 * 100.0 * delta; // 100.0 = mass
+
+        this.direction.z = Number(this.moveForward) - Number(this.moveBackward);
+        this.direction.x = Number(this.moveLeft) - Number(this.moveRight);
+
+        if (this.moveForward || this.moveBackward) this.velocity.z -= this.direction.z * 400.0 * delta;
+        if (this.moveLeft || this.moveRight) this.velocity.x -= this.direction.x * 400.0 * delta;
+    };
+
+    hasOnObject = () => {
+        if (this.onObject === true) {
+            this.velocity.y = Math.max(0, this.velocity.y);
+            this.canJump = true;
+        }
+    };
+
+    settingsControlsCharacter = (delta) => {
+        this.controls.getObject().translateX(this.velocity.x * delta);
+        this.controls.getObject().position.y += (this.velocity.y * delta); // new behavior
+        this.controls.getObject().translateZ(this.velocity.z * delta);
+    };
+
+    dontFall = () => {
+        if (this.controls.getObject().position.y < 10) {
+            this.velocity.y = 0;
+            this.controls.getObject().position.y = 10;
+            this.canJump = true;
+        }
+    };
 
     onWindowResize = () => {
         this.camera.aspect = window.innerWidth / window.innerHeight;
@@ -203,7 +256,7 @@ class Game {
     }
     onKeyUp = (event) => {
         // event.preventDefault();
-        
+
         switch (event.keyCode) {
             case 38: // up
             case 87: // w
@@ -223,7 +276,6 @@ class Game {
                 break;
         }
     };
-
     onKeyDown = (event) => {
         // event.preventDefault();
 
